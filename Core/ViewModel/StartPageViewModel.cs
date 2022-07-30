@@ -27,6 +27,7 @@ namespace Enforsement.Core.ViewModel
             ConsoleCommand = new Command(ConsoleInput);
             CompleteCommand = new Command(виконано);
             CloneCommand = new Command(Clone);
+            ExportCommand = new Command(Export);
 
             Items = new ObservableCollection<EnforsementClassSoket>();
             TypeSearchPanel = new ObservableCollection<string>
@@ -259,6 +260,7 @@ namespace Enforsement.Core.ViewModel
         public Command ConsoleCommand { get; }
         public Command CompleteCommand { get; }
         public Command CloneCommand { get; }
+        public Command ExportCommand { get; }
 
         #endregion
 
@@ -307,9 +309,9 @@ namespace Enforsement.Core.ViewModel
             await LoadItems();
         }
 
-        private async void ConsoleInput()
+        private void ConsoleInput()
         {
-            SearchTextSearchPanel =  FileSystem.Current.AppDataDirectory;
+            Process.Start("explorer.exe", FileSystem.Current.AppDataDirectory);         
         }
 
         private async void Delete()
@@ -383,6 +385,18 @@ namespace Enforsement.Core.ViewModel
                 enforsementClass.Description = _description;
                 await App.DataBase.SaveAsync(enforsementClass);
                 Clear();
+            }
+        }
+
+        private async void Export()
+        {
+            foreach (var item in await App.DataBase.GetAllAsync())
+            {
+                using(StreamWriter sr = new StreamWriter(Path.Combine(FileSystem.Current.AppDataDirectory, "export.csv"), true))
+                {
+                    string text = $"{item.Id}\t{item.Type}\t{item.CriminalNumber}\t{item.InitDate.ToShortDateString()}\t{item.ControlDate.ToShortDateString()}\t{item.Investigator}\t{item.Qualification}\t{item.Court}\t{item.Description}\t{item.Status}";
+                    sr.WriteLine(text);
+                }
             }
         }
 
@@ -539,7 +553,14 @@ namespace Enforsement.Core.ViewModel
 
             if (SearchTextSearchPanel != null)
             {
-                _result = _result.Where(x => x.Description.Contains(SearchTextSearchPanel, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (TextServise.IsNumberValid(SearchTextSearchPanel))
+                {
+                    _result = _result.Where(x => x.CriminalNumber == SearchTextSearchPanel).ToList();
+                }
+                else
+                {
+                    _result = _result.Where(x => x.Description.Contains(SearchTextSearchPanel, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
             }
         
 

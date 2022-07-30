@@ -86,15 +86,16 @@
                                         <Label  FontSize="12" TextColor="Black" Text="{Binding Type}"  LineBreakMode="NoWrap"></Label>
                                         <Label  FontSize="12" TextColor="Black" Text="від"  LineBreakMode="NoWrap"></Label>
                                         <Label  FontSize="13" TextColor="Black" Text="{Binding  InitDateSoket}"  LineBreakMode="NoWrap"></Label>
-                                        
+                                        <Label  FontSize="12" TextColor="Black" Text="№"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="13" TextColor="Black" Text="{Binding  Id}"  LineBreakMode="NoWrap"></Label>
                                     </HorizontalStackLayout>
 
                                     <HorizontalStackLayout WidthRequest="1000" HorizontalOptions="StartAndExpand" Spacing="3">
                                         <Label TextColor="Black"  FontSize="12" Text="{Binding CriminalNumber}"  LineBreakMode="NoWrap"></Label>
                                         <Label TextColor="Black"  FontSize="12" Text="ст."  LineBreakMode="NoWrap"></Label>
                                         <Label TextColor="Black"  FontSize="12" Text="{Binding Qualification}"  LineBreakMode="NoWrap"></Label>
-                                        <Label  FontSize="13" TextColor="Black" Text="строк:"  LineBreakMode="NoWrap"></Label>
-                                        <Label  FontSize="13" TextColor="White" Text="{Binding  Days}"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="13" TextColor="Black" Text="строк діб:"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="13" TextColor="Black" Text="{Binding  Days}"  LineBreakMode="NoWrap"></Label>
                                         <Label  FontSize="13" TextColor="Black" Text="{Binding  Status}"  LineBreakMode="NoWrap"></Label>
                                     </HorizontalStackLayout>
 
@@ -194,10 +195,10 @@
                         Command="{Binding EditCommand}"/>
                             <Button Text="🗑" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding DeleteCommand}"/>
-                            <Button Text="🛠" CornerRadius="15" Margin="3,3,3,3" 
+                            <Button Text="📂" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding ConsoleCommand}"/>
                             <Button Text="📤" CornerRadius="15" Margin="3,3,3,3" 
-                        Command="{Binding ConsoleCommand}"/>
+                        Command="{Binding ExportCommand}"/>
                         </HorizontalStackLayout>
                         
                       
