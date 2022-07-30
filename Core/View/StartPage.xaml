@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Enforsement.Core.View.StartPage"
+             xmlns:model="clr-namespace:Enforsement.Core.Model"
+             xmlns:viewmodel="clr-namespace:Enforsement.Core.ViewModel"
+             x:DataType="viewmodel:StartPageViewModel"
+             Title="🔑Заходи забезпечення кримінального провадження">
+
+    <Grid Margin="0,10,0,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"></ColumnDefinition>
+            <ColumnDefinition Width="5*"></ColumnDefinition>
+            <ColumnDefinition Width="3*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Frame Grid.Column="0" HasShadow="True" CornerRadius="15" Margin="2" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*"></RowDefinition>
+                    <RowDefinition Height="2*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <ScrollView VerticalOptions="FillAndExpand" Grid.Row="0">
+                    <StackLayout>
+
+                        <Entry Grid.Column="0" Margin="3,3,3,3" Placeholder="Поиск"
+                       Text="{Binding SearchTextSearchPanel}"></Entry>
+                        
+                        <Picker Margin="3,3,3,3" Title="Сортировка"
+                        ItemsSource="{Binding SortStates}" SelectedItem="{Binding SortState, Mode=TwoWay}"></Picker>
+
+                        <Picker Margin="3,3,3,3" Title="Тип"
+                        ItemsSource="{Binding TypeSearchPanel}" SelectedItem="{Binding SelectedTypeSearchPanel}"></Picker>
+
+                        <Picker Margin="3,3,3,3" Title="Статья"
+                        ItemsSource="{Binding QualificationsSearchPanel}" SelectedItem="{Binding SelectedQualificationSearchPanel}"></Picker>
+
+                        <Picker Margin="3,3,3,3" Title="Состояние"
+                        ItemsSource="{Binding ExecuteSearchPanel}" SelectedItem="{Binding SelectedExecuteSearchPanel}"></Picker>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="7*"></ColumnDefinition>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                          
+                           
+                        </Grid>
+
+                    </StackLayout>
+                </ScrollView>
+
+                <StackLayout VerticalOptions="End" Grid.Row="1">
+                    <StackLayout HorizontalOptions="Fill">
+
+                        <HorizontalStackLayout VerticalOptions="FillAndExpand">
+                            <Button Grid.Column="1" Text="🔎" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding SearchCommand}"/>
+                            <Button Text="Очистить поиск" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding ClearCommand}"/>
+                        </HorizontalStackLayout>
+                        
+                        <Button Text="Добавить" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding AddCommand}"/>
+
+                     
+
+                    </StackLayout>
+                </StackLayout>
+            </Grid>
+        </Frame>
+
+        <Frame Grid.Column="1" HasShadow="True" CornerRadius="15" Margin="2" Padding="20">
+            <CollectionView  x:Name="ItemsListView" 
+                ItemsSource="{Binding Items}"
+                SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <ContentView>
+                            <Frame HasShadow="True" BorderColor="White" CornerRadius="15" Margin="2" Padding="5" BackgroundColor="#87cded">
+                                <StackLayout HeightRequest="35" x:DataType="model:EnforsementClassSoket">
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label  FontSize="13" TextColor="Black" Text="{Binding TypeIcon}"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="14" FontAttributes="Bold"  TextColor="White" Text="{Binding  ControlDateSoket}"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="12" TextColor="Black" Text="{Binding Type}"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="12" TextColor="Black" Text="від"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="13" TextColor="Black" Text="{Binding  InitDateSoket}"  LineBreakMode="NoWrap"></Label>
+                                        
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout WidthRequest="1000" HorizontalOptions="StartAndExpand" Spacing="3">
+                                        <Label TextColor="Black"  FontSize="12" Text="{Binding CriminalNumber}"  LineBreakMode="NoWrap"></Label>
+                                        <Label TextColor="Black"  FontSize="12" Text="ст."  LineBreakMode="NoWrap"></Label>
+                                        <Label TextColor="Black"  FontSize="12" Text="{Binding Qualification}"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="13" TextColor="Black" Text="строк:"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="13" TextColor="White" Text="{Binding  Days}"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="13" TextColor="Black" Text="{Binding  Status}"  LineBreakMode="NoWrap"></Label>
+                                    </HorizontalStackLayout>
+
+                                </StackLayout>
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                NumberOfTapsRequired="1"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:StartPageViewModel}}, Path=ItemTappedSingle}"		
+                                CommandParameter="{Binding .}">
+                                    </TapGestureRecognizer>
+                                    <TapGestureRecognizer 
+                                NumberOfTapsRequired="2"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:StartPageViewModel}}, Path=ItemTappedDouble}"		
+                                CommandParameter="{Binding .}">
+                                    </TapGestureRecognizer>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal" />
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="#87cded" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Frame>
+
+        <Frame Grid.Column="2" HasShadow="True" CornerRadius="15" Margin="2" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*"></RowDefinition>
+                    <RowDefinition Height="2*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <ScrollView VerticalOptions="FillAndExpand" Grid.Row="0">
+                    <StackLayout>
+
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="Номер:"></Label>
+                            <Label IsEnabled="False" Text="{Binding IdDescription}"></Label>
+                        </HorizontalStackLayout>
+                        
+                        <Label Text="Уголовное дело"></Label>
+                        <Entry Margin="3,3,3,3" IsEnabled="False"   
+                       Text="{Binding CriminalNumberDescription, Mode=TwoWay}"></Entry>
+
+                        <Label Text="Описание"></Label>
+                        <Editor FontSize="11" HeightRequest="150" MaxLength="300" VerticalTextAlignment="Start" HorizontalTextAlignment="Start" Margin="3,3,3,3"  
+                       Text="{Binding DescriptionDescription, Mode=TwoWay}"></Editor>
+
+                        <Label Text="Тип"></Label>
+                        <Picker Margin="3,3,3,3"
+                        ItemsSource="{Binding TypeSearchPanel }" SelectedItem="{Binding TypeSelectedDescription}"></Picker>
+
+                        <Label Text="Статья"></Label>
+                        <Picker Margin="3,3,3,3"
+                        ItemsSource="{Binding QualificationsSearchPanel}" SelectedItem="{Binding SelectedQualificationDescription}"></Picker>
+
+                        <Label Text="Дата документа"></Label>
+                        <Entry Margin="3,3,3,3"  
+                       Text="{Binding InitDateDescription, Mode=TwoWay}"></Entry>
+
+                        <Label Text="Контрольна дата документа"></Label>
+                        <Entry Margin="3,3,3,3"  
+                       Text="{Binding ControlDateDescription, Mode=TwoWay}"></Entry>
+
+                        <Label Text="Следователь"></Label>
+                        <Entry Margin="3,3,3,3"   
+                       Text="{Binding InvestigatorDescription, Mode=TwoWay}"></Entry>
+
+                        <Label Text="Суд"></Label>
+                        <Picker Margin="3,3,3,3"
+                        ItemsSource="{Binding Courts}" SelectedItem="{Binding CourtDescription}"></Picker>
+                        
+                        <Entry Margin="3,3,3,3" IsEnabled="False"   
+                       Text="{Binding StatusDescription, Mode=TwoWay}"></Entry>
+
+                        <Button Text="Клонировать" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding CloneCommand}"/>
+
+                    </StackLayout>
+                </ScrollView>
+
+                <StackLayout VerticalOptions="End" Grid.Row="1">
+                    <StackLayout HorizontalOptions="Fill">
+                        <Button Text="Выполено" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding CompleteCommand}"/>
+                        
+                        <HorizontalStackLayout>
+                            <Button Text="✒" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding EditCommand}"/>
+                            <Button Text="🗑" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding DeleteCommand}"/>
+                            <Button Text="🛠" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding ConsoleCommand}"/>
+                            <Button Text="📤" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding ConsoleCommand}"/>
+                        </HorizontalStackLayout>
+                        
+                      
+                    </StackLayout>
+                </StackLayout>
+
+            </Grid>
+        </Frame>
+
+    </Grid>
+
+</ContentPage>
