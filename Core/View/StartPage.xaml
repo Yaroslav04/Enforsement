@@ -23,19 +23,19 @@
                 <ScrollView VerticalOptions="FillAndExpand" Grid.Row="0">
                     <StackLayout>
 
-                        <Entry Grid.Column="0" Margin="3,3,3,3" Placeholder="Поиск"
+                        <Entry Grid.Column="0" Margin="3,3,3,3" Placeholder="Пошук"
                        Text="{Binding SearchTextSearchPanel}"></Entry>
                         
-                        <Picker Margin="3,3,3,3" Title="Сортировка"
+                        <Picker Margin="3,3,3,3" Title="Сортування"
                         ItemsSource="{Binding SortStates}" SelectedItem="{Binding SortState, Mode=TwoWay}"></Picker>
 
                         <Picker Margin="3,3,3,3" Title="Тип"
                         ItemsSource="{Binding TypeSearchPanel}" SelectedItem="{Binding SelectedTypeSearchPanel}"></Picker>
 
-                        <Picker Margin="3,3,3,3" Title="Статья"
+                        <Picker Margin="3,3,3,3" Title="Стаття"
                         ItemsSource="{Binding QualificationsSearchPanel}" SelectedItem="{Binding SelectedQualificationSearchPanel}"></Picker>
 
-                        <Picker Margin="3,3,3,3" Title="Состояние"
+                        <Picker Margin="3,3,3,3" Title="Стан"
                         ItemsSource="{Binding ExecuteSearchPanel}" SelectedItem="{Binding SelectedExecuteSearchPanel}"></Picker>
 
                         <Grid>
@@ -56,11 +56,11 @@
                         <HorizontalStackLayout VerticalOptions="FillAndExpand">
                             <Button Grid.Column="1" Text="🔎" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding SearchCommand}"/>
-                            <Button Text="Очистить поиск" CornerRadius="15" Margin="3,3,3,3" 
+                            <Button Text="Очистити пошук" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding ClearCommand}"/>
                         </HorizontalStackLayout>
                         
-                        <Button Text="Добавить" CornerRadius="15" Margin="3,3,3,3" 
+                        <Button Text="Додати" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding AddCommand}"/>
 
                      
@@ -77,12 +77,15 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <ContentView>
-                            <Frame HasShadow="True" BorderColor="White" CornerRadius="15" Margin="2" Padding="5" BackgroundColor="#87cded">
-                                <StackLayout HeightRequest="35" x:DataType="model:EnforsementClassSoket">
+                            <Frame HasShadow="True" BorderColor="#87cded" CornerRadius="15" Margin="2" Padding="5" BackgroundColor="White">
+                                <StackLayout  HeightRequest="70" x:DataType="model:EnforsementClassSoket" Padding="5,0,0,0">
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Label  FontSize="13" TextColor="Black" Text="{Binding TypeIcon}"  LineBreakMode="NoWrap"></Label>
-                                        <Label  FontSize="14" FontAttributes="Bold"  TextColor="White" Text="{Binding  ControlDateSoket}"  LineBreakMode="NoWrap"></Label>
+                                        <Label  FontSize="14" FontAttributes="Bold"  TextColor="Black" Text="{Binding  ControlDateSoket}"  LineBreakMode="NoWrap"></Label>
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="5">
                                         <Label  FontSize="12" TextColor="Black" Text="{Binding Type}"  LineBreakMode="NoWrap"></Label>
                                         <Label  FontSize="12" TextColor="Black" Text="від"  LineBreakMode="NoWrap"></Label>
                                         <Label  FontSize="13" TextColor="Black" Text="{Binding  InitDateSoket}"  LineBreakMode="NoWrap"></Label>
@@ -94,6 +97,9 @@
                                         <Label TextColor="Black"  FontSize="12" Text="{Binding CriminalNumber}"  LineBreakMode="NoWrap"></Label>
                                         <Label TextColor="Black"  FontSize="12" Text="ст."  LineBreakMode="NoWrap"></Label>
                                         <Label TextColor="Black"  FontSize="12" Text="{Binding Qualification}"  LineBreakMode="NoWrap"></Label>
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="5">
                                         <Label  FontSize="13" TextColor="Black" Text="строк діб:"  LineBreakMode="NoWrap"></Label>
                                         <Label  FontSize="13" TextColor="Black" Text="{Binding  Days}"  LineBreakMode="NoWrap"></Label>
                                         <Label  FontSize="13" TextColor="Black" Text="{Binding  Status}"  LineBreakMode="NoWrap"></Label>
@@ -140,15 +146,15 @@
                     <StackLayout>
 
                         <HorizontalStackLayout Spacing="10">
-                            <Label Text="Номер:"></Label>
+                            <Label Text="Порядковий номер:"></Label>
                             <Label IsEnabled="False" Text="{Binding IdDescription}"></Label>
                         </HorizontalStackLayout>
                         
-                        <Label Text="Уголовное дело"></Label>
+                        <Label Text="Кримінальне проваджененя"></Label>
                         <Entry Margin="3,3,3,3" IsEnabled="False"   
                        Text="{Binding CriminalNumberDescription, Mode=TwoWay}"></Entry>
 
-                        <Label Text="Описание"></Label>
+                        <Label Text="Опис"></Label>
                         <Editor FontSize="11" HeightRequest="150" MaxLength="300" VerticalTextAlignment="Start" HorizontalTextAlignment="Start" Margin="3,3,3,3"  
                        Text="{Binding DescriptionDescription, Mode=TwoWay}"></Editor>
 
@@ -156,38 +162,42 @@
                         <Picker Margin="3,3,3,3"
                         ItemsSource="{Binding TypeSearchPanel }" SelectedItem="{Binding TypeSelectedDescription}"></Picker>
 
-                        <Label Text="Статья"></Label>
+                        <Label Text="Стаття"></Label>
                         <Picker Margin="3,3,3,3"
                         ItemsSource="{Binding QualificationsSearchPanel}" SelectedItem="{Binding SelectedQualificationDescription}"></Picker>
 
-                        <Label Text="Дата документа"></Label>
+                        <Label Text="Дата документу"></Label>
                         <Entry Margin="3,3,3,3"  
                        Text="{Binding InitDateDescription, Mode=TwoWay}"></Entry>
 
-                        <Label Text="Контрольна дата документа"></Label>
+                        <Label Text="Контрольна дата документу"></Label>
                         <Entry Margin="3,3,3,3"  
                        Text="{Binding ControlDateDescription, Mode=TwoWay}"></Entry>
 
-                        <Label Text="Следователь"></Label>
+                        <Label Text="Слідчий"></Label>
                         <Entry Margin="3,3,3,3"   
                        Text="{Binding InvestigatorDescription, Mode=TwoWay}"></Entry>
 
                         <Label Text="Суд"></Label>
                         <Picker Margin="3,3,3,3"
                         ItemsSource="{Binding Courts}" SelectedItem="{Binding CourtDescription}"></Picker>
-                        
+
                         <Entry Margin="3,3,3,3" IsEnabled="False"   
                        Text="{Binding StatusDescription, Mode=TwoWay}"></Entry>
 
-                        <Button Text="Клонировать" CornerRadius="15" Margin="3,3,3,3" 
+                        <Button Text="Відмовлено судом" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding CanselCommand}"/>
+
+                        <Button Text="Клонувати" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding CloneCommand}"/>
+
 
                     </StackLayout>
                 </ScrollView>
 
                 <StackLayout VerticalOptions="End" Grid.Row="1">
                     <StackLayout HorizontalOptions="Fill">
-                        <Button Text="Выполено" CornerRadius="15" Margin="3,3,3,3" 
+                        <Button Text="Виконано" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding CompleteCommand}"/>
                         
                         <HorizontalStackLayout>
