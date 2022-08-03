@@ -29,11 +29,12 @@ namespace Enforsement.Core.ViewModel
             CloneCommand = new Command(Clone);
             ExportCommand = new Command(Export);
             CanselCommand = new Command(Cansel);
+            LostCommand = new Command(Lost);
 
             Items = new ObservableCollection<EnforsementClassSoket>();
             TypeSearchPanel = new ObservableCollection<string>
             {
-                "Арешт майна", "Тимчасовий доступ", "Обшук", "Затримання з метою приводу"
+                "Арешт майна", "Тимчасовий доступ", "Обшук", "Невідкладний обшук", "Огляд", "Затримання з метою приводу"
             };
             QualificationsSearchPanel = new ObservableCollection<string>();
             for ( int i =110; i < 448; i++)
@@ -42,7 +43,7 @@ namespace Enforsement.Core.ViewModel
             }
             ExecuteSearchPanel = new ObservableCollection<string>
             {
-                "На виконанні", "Виконані", "Прострочені", "Відмовлені"
+                "На виконанні", "Прострочені", "Відмовлені судом", "Виконані", "Пропущені"
             };
             Courts = new ObservableCollection<string>
             {
@@ -50,7 +51,7 @@ namespace Enforsement.Core.ViewModel
             };
             SortStates = new ObservableCollection<string>()
             {
-                "За зростанням по даті винесення", "За спаданням по даті винесення", "За зростанням по контрольній даті", "За спаданням по контрольній даті"
+                "За зростанням по даті винесення", "За спаданням по даті винесення", "За зростанням по контрольній даті", "За спаданням по контрольній даті", "За порядковим номером"
             };
 
             RunAsync();
@@ -58,7 +59,7 @@ namespace Enforsement.Core.ViewModel
 
         private async void RunAsync()
         {
-            SortState = "За зростанням по контрольній даті";
+            SortState = "За спаданням по контрольній даті";
             SelectedExecuteSearchPanel = "Прострочені";
             await LoadItems();
         }
@@ -262,8 +263,8 @@ namespace Enforsement.Core.ViewModel
         public Command CompleteCommand { get; }
         public Command CloneCommand { get; }
         public Command ExportCommand { get; }
-
         public Command CanselCommand { get; }
+        public Command LostCommand { get; }
 
         #endregion
 
@@ -323,11 +324,16 @@ namespace Enforsement.Core.ViewModel
             Process.Start("explorer.exe", FileSystem.Current.AppDataDirectory);         
         }
 
+        private void Search()
+        {
+            LoadItems();
+        }
+
         private async void Delete()
         {
             if (selectedItem != null)
             {
-                var result = await Shell.Current.DisplayActionSheet($"Видалити {selectedItem.Type}", destruction: "OK", cancel: "Відміна");
+                var result = await Shell.Current.DisplayActionSheet($"Видалити?", destruction: "OK", cancel: "Відміна");
                 if (result == "OK")
                 {
                     await App.DataBase.DeleteAsync(SoketToEnforsementClass.Convert(selectedItem));
@@ -340,7 +346,7 @@ namespace Enforsement.Core.ViewModel
         {
             if (selectedItem != null)
             {
-                var result = await Shell.Current.DisplayActionSheet($"Редагувати {selectedItem.Type}", destruction: "OK", cancel: "Відміна");
+                var result = await Shell.Current.DisplayActionSheet($"Редагувати ?", destruction: "OK", cancel: "Відміна");
                 if (result == "OK")
                 {
                     EnforsementClass enforsementClass = new EnforsementClass();
@@ -357,101 +363,157 @@ namespace Enforsement.Core.ViewModel
                     await App.DataBase.UpdateAsync(enforsementClass);
                     await ClearAsync();
                 }
-            }        
+            }
+            else
+            {
+                await Shell.Current.DisplayActionSheet($"Виберіть елемент зі списку", destruction: "OK", cancel: "Відміна");
+            }
         }
 
-        private void Search()
-        {
-            LoadItems();
-        }
-
-        private void Complete()
-        {
-            CompleteAsync();
-        }
-
-        private async void CompleteAsync()
+        private async void Complete()
         {
             if (selectedItem != null)
             {
-                EnforsementClass enforsementClass = new EnforsementClass();
-                enforsementClass.Id = Convert.ToInt32(IdDescription);
-                enforsementClass.CriminalNumber = CriminalNumberDescription;
-                enforsementClass.Type = TypeSelectedDescription;
-                enforsementClass.Qualification = SelectedQualificationDescription;
-                enforsementClass.InitDate = Convert.ToDateTime(InitDateDescription);
-                enforsementClass.ControlDate = Convert.ToDateTime(ControlDateDescription);
-                enforsementClass.Court = CourtDescription;
-                enforsementClass.Investigator = InvestigatorDescription;
-                enforsementClass.Description = DescriptionDescription;
-                enforsementClass.Status = "виконано";
-                await App.DataBase.UpdateAsync(enforsementClass);
-                await ClearAsync();
+                var result = await Shell.Current.DisplayActionSheet($"Виконано ?", destruction: "OK", cancel: "Відміна");
+                if (result == "OK")
+                {
+                    EnforsementClass enforsementClass = new EnforsementClass();
+                    enforsementClass.Id = Convert.ToInt32(IdDescription);
+                    enforsementClass.CriminalNumber = CriminalNumberDescription;
+                    enforsementClass.Type = TypeSelectedDescription;
+                    enforsementClass.Qualification = SelectedQualificationDescription;
+                    enforsementClass.InitDate = Convert.ToDateTime(InitDateDescription);
+                    enforsementClass.ControlDate = Convert.ToDateTime(ControlDateDescription);
+                    enforsementClass.Court = CourtDescription;
+                    enforsementClass.Investigator = InvestigatorDescription;
+                    enforsementClass.Description = DescriptionDescription;
+                    enforsementClass.Status = "виконано";
+                    await App.DataBase.UpdateAsync(enforsementClass);
+                    await ClearAsync();
+                }
+            }
+            else
+            {
+                await Shell.Current.DisplayActionSheet($"Виберіть елемент зі списку", destruction: "OK", cancel: "Відміна");
             }
         }
+
 
         private async void Clone()
         {
             if (selectedItem != null)
             {
-                int count = 0;
-                var n = await App.DataBase.GetAllAsync();
-                if (n.Count > 0)
+                var result = await Shell.Current.DisplayActionSheet($"Клонувати ?", destruction: "OK", cancel: "Відміна");
+                if (result == "OK")
                 {
-                    count = n.Last().Id + 1;
-                }
-                EnforsementClass enforsementClass = new EnforsementClass();               
-                enforsementClass.CriminalNumber = CriminalNumberDescription;
-                enforsementClass.Type = TypeSelectedDescription;
-                enforsementClass.Qualification = SelectedQualificationDescription;
-                enforsementClass.InitDate = Convert.ToDateTime(InitDateDescription);
-                enforsementClass.ControlDate = Convert.ToDateTime(ControlDateDescription);
-                enforsementClass.Court = CourtDescription;
-                enforsementClass.Investigator = InvestigatorDescription;              
-                enforsementClass.Status = "на виконанні";
-                string _description = await Shell.Current.DisplayPromptAsync($"Клонувати елемент", $"Введіть опис:", maxLength: 300);  
-                if (!String.IsNullOrWhiteSpace(_description))
-                {
-                    enforsementClass.Description = _description;
-                    await App.DataBase.SaveAsync(enforsementClass);
-                    await ClearAsync();
-                    await Shell.Current.DisplayAlert("Додати новий елемент", $"Зарєстровано, порядковий номер {count}", "OK");
+                    int count = 0;
+                    var n = await App.DataBase.GetAllAsync();
+                    if (n.Count > 0)
+                    {
+                        count = n.Last().Id + 1;
+                    }
+                    EnforsementClass enforsementClass = new EnforsementClass();
+                    enforsementClass.CriminalNumber = CriminalNumberDescription;
+                    enforsementClass.Type = TypeSelectedDescription;
+                    enforsementClass.Qualification = SelectedQualificationDescription;
+                    enforsementClass.InitDate = Convert.ToDateTime(InitDateDescription);
+                    enforsementClass.ControlDate = Convert.ToDateTime(ControlDateDescription);
+                    enforsementClass.Court = CourtDescription;
+                    enforsementClass.Investigator = InvestigatorDescription;
+                    enforsementClass.Status = "на виконанні";
+                    string _description = await Shell.Current.DisplayPromptAsync($"Клонувати елемент", $"Введіть опис:", maxLength: 300);
+                    if (!String.IsNullOrWhiteSpace(_description))
+                    {
+                        enforsementClass.Description = _description;
+                        await App.DataBase.SaveAsync(enforsementClass);
+                        await ClearAsync();
+                        await Shell.Current.DisplayAlert("Додати новий елемент", $"Зарєстровано, порядковий номер {count}", "OK");
 
+                    }
                 }
+            }
+            else
+            {
+                await Shell.Current.DisplayActionSheet($"Виберіть елемент зі списку", destruction: "OK", cancel: "Відміна");
             }
         }
 
         private async void Export()
         {
+            if (File.Exists(Path.Combine(FileSystem.Current.AppDataDirectory, "export.csv")))
+            {
+                File.Delete(Path.Combine(FileSystem.Current.AppDataDirectory, "export.csv"));
+            }
+
+            using (StreamWriter sr = new StreamWriter(Path.Combine(FileSystem.Current.AppDataDirectory, "export.csv"), true))
+            {
+                string text = $"№\tТип\tНомер кримінального провадження\tДата ініціювання документу\tКонтрольна дата документу\tСлідчий\tКваліфікація\tСуд\tОпис\tСтатус";
+                sr.WriteLine(text);
+            }
             foreach (var item in await App.DataBase.GetAllAsync())
             {
                 using(StreamWriter sr = new StreamWriter(Path.Combine(FileSystem.Current.AppDataDirectory, "export.csv"), true))
                 {
                     string text = $"{item.Id}\t{item.Type}\t{item.CriminalNumber}\t{item.InitDate.ToShortDateString()}\t{item.ControlDate.ToShortDateString()}\t{item.Investigator}\t{item.Qualification}\t{item.Court}\t{item.Description}\t{item.Status}";
                     sr.WriteLine(text);
-
                 }
             }
             await Shell.Current.DisplayAlert("Експорт", $"Експорт виконано, перейдіть до системної папки📂", "OK");
         }
 
-        private async void Cansel(object obj)
+        private async void Cansel()
         {
             if (selectedItem != null)
             {
-                EnforsementClass enforsementClass = new EnforsementClass();
-                enforsementClass.Id = Convert.ToInt32(IdDescription);
-                enforsementClass.CriminalNumber = CriminalNumberDescription;
-                enforsementClass.Type = TypeSelectedDescription;
-                enforsementClass.Qualification = SelectedQualificationDescription;
-                enforsementClass.InitDate = Convert.ToDateTime(InitDateDescription);
-                enforsementClass.ControlDate = Convert.ToDateTime(ControlDateDescription);
-                enforsementClass.Court = CourtDescription;
-                enforsementClass.Investigator = InvestigatorDescription;
-                enforsementClass.Description = DescriptionDescription;
-                enforsementClass.Status = "відмовлено";
-                await App.DataBase.UpdateAsync(enforsementClass);
-                await ClearAsync();
+                var result = await Shell.Current.DisplayActionSheet($"Відмовлено судом ?", destruction: "OK", cancel: "Відміна");
+                if (result == "OK")
+                {
+                    EnforsementClass enforsementClass = new EnforsementClass();
+                    enforsementClass.Id = Convert.ToInt32(IdDescription);
+                    enforsementClass.CriminalNumber = CriminalNumberDescription;
+                    enforsementClass.Type = TypeSelectedDescription;
+                    enforsementClass.Qualification = SelectedQualificationDescription;
+                    enforsementClass.InitDate = Convert.ToDateTime(InitDateDescription);
+                    enforsementClass.ControlDate = Convert.ToDateTime(ControlDateDescription);
+                    enforsementClass.Court = CourtDescription;
+                    enforsementClass.Investigator = InvestigatorDescription;
+                    enforsementClass.Description = DescriptionDescription;
+                    enforsementClass.Status = "відмовлено";
+                    await App.DataBase.UpdateAsync(enforsementClass);
+                    await ClearAsync();
+                }
+            }
+            else
+            {
+                await Shell.Current.DisplayActionSheet($"Виберіть елемент зі списку", destruction: "OK", cancel: "Відміна");
+            }
+        }
+
+        private async void Lost()
+        {
+            if (selectedItem != null)
+            {
+                var result = await Shell.Current.DisplayActionSheet($"Пропущено строк виконання?", destruction: "OK", cancel: "Відміна");
+                if (result == "OK")
+                {
+                    EnforsementClass enforsementClass = new EnforsementClass();
+                    enforsementClass.Id = Convert.ToInt32(IdDescription);
+                    enforsementClass.CriminalNumber = CriminalNumberDescription;
+                    enforsementClass.Type = TypeSelectedDescription;
+                    enforsementClass.Qualification = SelectedQualificationDescription;
+                    enforsementClass.InitDate = Convert.ToDateTime(InitDateDescription);
+                    enforsementClass.ControlDate = Convert.ToDateTime(ControlDateDescription);
+                    enforsementClass.Court = CourtDescription;
+                    enforsementClass.Investigator = InvestigatorDescription;
+                    enforsementClass.Description = DescriptionDescription;
+                    enforsementClass.Status = "пропущено";
+                    await App.DataBase.UpdateAsync(enforsementClass);
+                    await ClearAsync();
+                }
+            }
+            else
+            {
+                await Shell.Current.DisplayActionSheet($"Виберіть елемент зі списку", destruction: "OK", cancel: "Відміна");
             }
         }
 
@@ -482,7 +544,7 @@ namespace Enforsement.Core.ViewModel
                     return;
                 }
                 string _controlDate;
-                if (_type != "Арешт майна")
+                if (_type != "Арешт майна" | _type != "Невідкладний обшук")
                 {
                     _controlDate = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть контрольну дату докуенту", maxLength: 10, initialValue: (Convert.ToDateTime(_initDate).AddDays(30)).ToShortDateString());
                     if (!TextServise.IsDateValid(_controlDate))
@@ -532,14 +594,21 @@ namespace Enforsement.Core.ViewModel
             {
                 EnforsementClassSoket enforsementClassSoket = new EnforsementClassSoket(item);
                 enforsementClassSoket.InitDateSoket = item.InitDate.ToShortDateString();
-                if (item.Type != "Арешт майна")
+                if (item.Type == "Арешт майна")
                 {
-                    enforsementClassSoket.ControlDateSoket = item.ControlDate.ToShortDateString();
-                    enforsementClassSoket.Days = (item.ControlDate - DateTime.Now).Days;
+                    enforsementClassSoket.ControlDateSoket = "-";
+                    enforsementClassSoket.Days = "-";
+                }
+                else if (item.Type == "Невідкладний обшук")
+                {
+                    enforsementClassSoket.ControlDateSoket = "-";
+                    enforsementClassSoket.Days = "-" ;
                 }
                 else
                 {
-                    enforsementClassSoket.ControlDateSoket = "-";
+                    enforsementClassSoket.ControlDateSoket = item.ControlDate.ToShortDateString();
+                    enforsementClassSoket.Days = (item.ControlDate - DateTime.Now).Days.ToString();
+              
                 }
                
 
@@ -555,6 +624,12 @@ namespace Enforsement.Core.ViewModel
                     case "Обшук":
                         _typeIcon = "🔎";
                         break;
+                    case "Невідкладний обшук":
+                        _typeIcon = "🚀";
+                        break;
+                    case "Огляд":
+                        _typeIcon = "👁";
+                        break;
                     case "Затримання з метою приводу":
                         _typeIcon = "🔗";
                         break;
@@ -563,16 +638,6 @@ namespace Enforsement.Core.ViewModel
                 enforsementClassSoket.TypeIcon = _typeIcon;
                 _result.Add(enforsementClassSoket);
             }
-
-            if (SelectedExecuteSearchPanel == "Відмовлені")
-            {
-                _result = _result.Where(x => x.Status == "відмовлено").ToList();
-            }
-            else
-            {
-                _result = _result.Where(x => x.Status != "відмовлено").ToList();
-            }
-
 
             if (SortState == "За зростанням по даті винесення")
             {
@@ -589,6 +654,10 @@ namespace Enforsement.Core.ViewModel
             else if (SortState == "За спаданням по контрольній даті")
             {
                 _result = _result.OrderByDescending(x => x.ControlDate).ToList();
+            }
+            else if (SortState == "За порядковим номером")
+            {
+                _result = _result.OrderByDescending(x => x.Id).ToList();
             }
             else
             {
@@ -612,10 +681,15 @@ namespace Enforsement.Core.ViewModel
             {
                 _result = _result.Where(x => x.Type == "Затримання з метою приводу").ToList();
             }
-            else if (SelectedQualificationSearchPanel != null)
+            else if (SelectedTypeSearchPanel == "Невідкладний обшук")
             {
-                _result = _result.Where(x => x.Qualification == SelectedQualificationSearchPanel).ToList();
+                _result = _result.Where(x => x.Type == "Невідкладний обшук").ToList();
             }
+            else if (SelectedTypeSearchPanel == "Огляд")
+            {
+                _result = _result.Where(x => x.Type == "Огляд").ToList();
+            }
+
 
             if (SelectedExecuteSearchPanel == "На виконанні")
             {
@@ -625,11 +699,24 @@ namespace Enforsement.Core.ViewModel
             {
                 _result = _result.Where(x => x.Status == "виконано").ToList();
             }
+            else if (SelectedExecuteSearchPanel == "Відмовлені судом")
+            {
+                _result = _result.Where(x => x.Status == "відмовлено").ToList();
+            }
+            else if (SelectedExecuteSearchPanel == "Пропущені")
+            {
+                _result = _result.Where(x => x.Status == "пропущено").ToList();
+            }
             else if (SelectedExecuteSearchPanel == "Прострочені")
             {
-                _result = _result.Where(x => x.ControlDate < DateTime.Now).ToList();
+                _result = _result.Where(x => (x.ControlDate - DateTime.Now).TotalDays < 5).ToList();
                 _result = _result.Where(x => x.Status == "на виконанні").ToList();
                 _result = _result.Where(x => x.Type != "Арешт майна").ToList();
+                _result = _result.Where(x => x.Type != "Невідкладний обшук").ToList();
+            }
+            else
+            {
+                _result = _result.Where(x => x.Status == "на виконанні").ToList();
             }
 
             if (SearchTextSearchPanel != null)
@@ -644,7 +731,6 @@ namespace Enforsement.Core.ViewModel
                 }
             }
         
-
             foreach (var item in _result)
             {
                 Items.Add(item);

@@ -197,9 +197,18 @@
 
                 <StackLayout VerticalOptions="End" Grid.Row="1">
                     <StackLayout HorizontalOptions="Fill">
-                        <Button Text="Виконано" CornerRadius="15" Margin="3,3,3,3" 
+                        <HorizontalStackLayout VerticalOptions="FillAndExpand">
+                            <Button Text="👍" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding CompleteCommand}"/>
-                        
+                            <Button Text="👎" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding LostCommand}"/>
+                            <Button Text="⛔" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding CanselCommand}"/>
+                            <Button Text="👯" CornerRadius="15" Margin="3,3,3,3" 
+                        Command="{Binding CloneCommand}"/>
+
+                        </HorizontalStackLayout>
+
                         <HorizontalStackLayout>
                             <Button Text="✒" CornerRadius="15" Margin="3,3,3,3" 
                         Command="{Binding EditCommand}"/>

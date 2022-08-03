@@ -10,7 +10,7 @@ namespace Enforsement.Core.Model
     {
         public string InitDateSoket { get; set; }
         public string ControlDateSoket { get; set; }
-        public int Days { get; set; }
+        public string Days { get; set; }
         public string TypeIcon {get; set; }
         public string TermIcon { get; set; }
 
