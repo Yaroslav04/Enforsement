@@ -293,14 +293,10 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private void Clear()
-        {
-            ClearAsync();
-        }
-
-        private async Task ClearAsync()
+        private async void Clear()
         {
             selectedItem = null;
+
             DescriptionDescription = null;
             CourtDescription = null;
             SelectedQualificationDescription = null;
@@ -310,11 +306,12 @@ namespace Enforsement.Core.ViewModel
             CriminalNumberDescription = null;
             TypeSelectedDescription = null;
             IdDescription = null;
+            StatusDescription = null;
+
             SelectedExecuteSearchPanel = null;
             SelectedQualificationSearchPanel = null;
             SelectedTypeSearchPanel = null;
             SearchTextSearchPanel = null;
-            StatusDescription = null;
             await LoadItems();
             return;
         }
@@ -337,7 +334,19 @@ namespace Enforsement.Core.ViewModel
                 if (result == "OK")
                 {
                     await App.DataBase.DeleteAsync(SoketToEnforsementClass.Convert(selectedItem));
-                    await ClearAsync();
+                    
+                    selectedItem = null;
+                    DescriptionDescription = null;
+                    CourtDescription = null;
+                    SelectedQualificationDescription = null;
+                    InvestigatorDescription = null;
+                    ControlDateDescription = null;
+                    InitDateDescription = null;
+                    CriminalNumberDescription = null;
+                    TypeSelectedDescription = null;
+                    IdDescription = null;
+                    StatusDescription = null;
+                    await LoadItems();
                 }
             }       
         }
@@ -361,7 +370,7 @@ namespace Enforsement.Core.ViewModel
                     enforsementClass.Description = DescriptionDescription;
                     enforsementClass.Status = StatusDescription;
                     await App.DataBase.UpdateAsync(enforsementClass);
-                    await ClearAsync();
+                    await LoadItems();
                 }
             }
             else
@@ -389,7 +398,7 @@ namespace Enforsement.Core.ViewModel
                     enforsementClass.Description = DescriptionDescription;
                     enforsementClass.Status = "виконано";
                     await App.DataBase.UpdateAsync(enforsementClass);
-                    await ClearAsync();
+                    await LoadItems();
                 }
             }
             else
@@ -425,10 +434,10 @@ namespace Enforsement.Core.ViewModel
                     if (!String.IsNullOrWhiteSpace(_description))
                     {
                         enforsementClass.Description = _description;
-                        await App.DataBase.SaveAsync(enforsementClass);
-                        await ClearAsync();
+                        await App.DataBase.SaveAsync(enforsementClass);              
+                        SortState = "За порядковим номером";
+                        Clear();
                         await Shell.Current.DisplayAlert("Додати новий елемент", $"Зарєстровано, порядковий номер {count}", "OK");
-
                     }
                 }
             }
@@ -480,7 +489,7 @@ namespace Enforsement.Core.ViewModel
                     enforsementClass.Description = DescriptionDescription;
                     enforsementClass.Status = "відмовлено";
                     await App.DataBase.UpdateAsync(enforsementClass);
-                    await ClearAsync();
+                    await LoadItems();
                 }
             }
             else
@@ -508,7 +517,7 @@ namespace Enforsement.Core.ViewModel
                     enforsementClass.Description = DescriptionDescription;
                     enforsementClass.Status = "пропущено";
                     await App.DataBase.UpdateAsync(enforsementClass);
-                    await ClearAsync();
+                    await LoadItems();
                 }
             }
             else
@@ -573,7 +582,8 @@ namespace Enforsement.Core.ViewModel
                 enforsementClass.Description = _description;
                 enforsementClass.Status = "на виконанні";
                 await App.DataBase.SaveAsync(enforsementClass);
-                await ClearAsync();
+                SortState = "За порядковим номером";
+                Clear();
                 await Shell.Current.DisplayAlert("Додати новий елемент", $"Зарєстровано, порядковий номер {count}", "OK");
 
             }
@@ -608,7 +618,6 @@ namespace Enforsement.Core.ViewModel
                 {
                     enforsementClassSoket.ControlDateSoket = item.ControlDate.ToShortDateString();
                     enforsementClassSoket.Days = (item.ControlDate - DateTime.Now).Days.ToString();
-              
                 }
                
 
@@ -690,6 +699,19 @@ namespace Enforsement.Core.ViewModel
                 _result = _result.Where(x => x.Type == "Огляд").ToList();
             }
 
+            if (SelectedQualificationSearchPanel != null)
+            {
+                var _subresult = _result.Where(x => x.Qualification == SelectedQualificationSearchPanel).ToList();
+                if (_subresult.Count > 0)
+                {
+                    _result = _subresult;
+                }
+                else
+                {
+                    return;
+                }
+            }
+     
 
             if (SelectedExecuteSearchPanel == "На виконанні")
             {
@@ -714,27 +736,41 @@ namespace Enforsement.Core.ViewModel
                 _result = _result.Where(x => x.Type != "Арешт майна").ToList();
                 _result = _result.Where(x => x.Type != "Невідкладний обшук").ToList();
             }
-            else
-            {
-                _result = _result.Where(x => x.Status == "на виконанні").ToList();
-            }
 
             if (SearchTextSearchPanel != null)
             {
                 if (TextServise.IsNumberValid(SearchTextSearchPanel))
                 {
-                    _result = _result.Where(x => x.CriminalNumber == SearchTextSearchPanel).ToList();
+                    var _subresult = _result.Where(x => x.CriminalNumber == SearchTextSearchPanel).ToList();
+                    if (_subresult.Count > 0)
+                    {
+                        _result = _subresult;
+                    }
                 }
-                else
+                else if (SearchTextSearchPanel.Length > 2)
                 {
-                    _result = _result.Where(x => x.Description.Contains(SearchTextSearchPanel, StringComparison.OrdinalIgnoreCase)).ToList();
+                    var _subresult = _result.Where(x => x.Description.Contains(SearchTextSearchPanel, StringComparison.OrdinalIgnoreCase)).ToList();
+                    if (_subresult.Count > 0)
+                    {
+                        _result = _subresult;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                    
                 }
             }
-        
-            foreach (var item in _result)
+
+
+            if (_result.Count > 0)
             {
-                Items.Add(item);
+                foreach (var item in _result)
+                {
+                    Items.Add(item);
+                }
             }
+            
             return;
         }
 

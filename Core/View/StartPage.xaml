@@ -185,13 +185,6 @@
                         <Entry Margin="3,3,3,3" IsEnabled="False"   
                        Text="{Binding StatusDescription, Mode=TwoWay}"></Entry>
 
-                        <Button Text="Відмовлено судом" CornerRadius="15" Margin="3,3,3,3" 
-                        Command="{Binding CanselCommand}"/>
-
-                        <Button Text="Клонувати" CornerRadius="15" Margin="3,3,3,3" 
-                        Command="{Binding CloneCommand}"/>
-
-
                     </StackLayout>
                 </ScrollView>
 
