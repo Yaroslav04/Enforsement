@@ -16,15 +16,13 @@ namespace Enforsement.Core.ViewModel
     {
         public StartPageViewModel()
         {
-            Debug.WriteLine(FileSystem.Current.AppDataDirectory);
             ItemTappedSingle = new Command<EnforsementClassSoket>(OnSingleItemTapped);
-            ItemTappedDouble = new Command<EnforsementClassSoket>(OnDoubleItemTapped);
             AddCommand = new Command(Add);
             SearchCommand = new Command(Search);
             ClearCommand = new Command(Clear);
             EditCommand = new Command(Edit);
             DeleteCommand = new Command(Delete);
-            ConsoleCommand = new Command(ConsoleInput);
+            ConsoleCommand = new Command(OpenFolder);
             CompleteCommand = new Command(Complete);
             CloneCommand = new Command(Clone);
             ExportCommand = new Command(Export);
@@ -37,7 +35,7 @@ namespace Enforsement.Core.ViewModel
                 "Арешт майна", "Тимчасовий доступ", "Обшук", "Невідкладний обшук", "Огляд", "Затримання з метою приводу"
             };
             QualificationsSearchPanel = new ObservableCollection<string>();
-            for ( int i =110; i < 448; i++)
+            for (int i = 110; i < 448; i++)
             {
                 QualificationsSearchPanel.Add(i.ToString());
             }
@@ -55,18 +53,6 @@ namespace Enforsement.Core.ViewModel
             };
 
             RunAsync();
-        }
-
-        private async void RunAsync()
-        {
-            SortState = "За спаданням по контрольній даті";
-            SelectedExecuteSearchPanel = "Прострочені";
-            await LoadItems();
-        }
-
-        public void OnAppearing()
-        {
-
         }
 
         #region Properties
@@ -113,7 +99,7 @@ namespace Enforsement.Core.ViewModel
                 //{
                 //    LoadItems();
                 //}
-                
+
             }
         }
         public ObservableCollection<string> QualificationsSearchPanel { get; }
@@ -158,7 +144,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string idDescription = null ;
+        private string idDescription = null;
         public string IdDescription
         {
             get => idDescription;
@@ -168,7 +154,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string typeSelectedDescription = null ;
+        private string typeSelectedDescription = null;
         public string TypeSelectedDescription
         {
             get => typeSelectedDescription;
@@ -178,7 +164,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string criminalNumberDescription = null ;
+        private string criminalNumberDescription = null;
         public string CriminalNumberDescription
         {
             get => criminalNumberDescription;
@@ -188,7 +174,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string initDateDescription = null ;
+        private string initDateDescription = null;
         public string InitDateDescription
         {
             get => initDateDescription;
@@ -198,7 +184,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string controlDateDescription = null ;
+        private string controlDateDescription = null;
         public string ControlDateDescription
         {
             get => controlDateDescription;
@@ -208,7 +194,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string investigatorDescription = null ;
+        private string investigatorDescription = null;
         public string InvestigatorDescription
         {
             get => investigatorDescription;
@@ -218,7 +204,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string selectedQualificationDescription = null ;
+        private string selectedQualificationDescription = null;
         public string SelectedQualificationDescription
         {
             get => selectedQualificationDescription;
@@ -228,7 +214,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string courtDescription = null ;
+        private string courtDescription = null;
         public string CourtDescription
         {
             get => courtDescription;
@@ -238,7 +224,7 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-        private string descriptionDescription = null ;
+        private string descriptionDescription = null;
         public string DescriptionDescription
         {
             get => descriptionDescription;
@@ -253,7 +239,6 @@ namespace Enforsement.Core.ViewModel
         #region Command
 
         public Command<EnforsementClassSoket> ItemTappedSingle { get; }
-        public Command<EnforsementClassSoket> ItemTappedDouble { get; }
         public Command AddCommand { get; }
         public Command SearchCommand { get; }
         public Command ClearCommand { get; }
@@ -268,11 +253,14 @@ namespace Enforsement.Core.ViewModel
 
         #endregion
 
-
         #region Main
-        private void OnDoubleItemTapped(EnforsementClass _item)
-        {
 
+        private async void RunAsync()
+        {
+            await StartControl();
+            SortState = "За зростанням по контрольній даті";
+            SelectedExecuteSearchPanel = "Прострочені";
+            await LoadItems();
         }
 
         private void OnSingleItemTapped(EnforsementClassSoket _item)
@@ -289,14 +277,13 @@ namespace Enforsement.Core.ViewModel
                 InvestigatorDescription = _item.Investigator;
                 CourtDescription = _item.Court;
                 DescriptionDescription = _item.Description;
-                StatusDescription = _item.Status;  
+                StatusDescription = _item.Status;
             }
         }
 
         private async void Clear()
         {
             selectedItem = null;
-
             DescriptionDescription = null;
             CourtDescription = null;
             SelectedQualificationDescription = null;
@@ -307,7 +294,6 @@ namespace Enforsement.Core.ViewModel
             TypeSelectedDescription = null;
             IdDescription = null;
             StatusDescription = null;
-
             SelectedExecuteSearchPanel = null;
             SelectedQualificationSearchPanel = null;
             SelectedTypeSearchPanel = null;
@@ -316,9 +302,9 @@ namespace Enforsement.Core.ViewModel
             return;
         }
 
-        private void ConsoleInput()
+        private void OpenFolder()
         {
-            Process.Start("explorer.exe", FileSystem.Current.AppDataDirectory);         
+            Process.Start("explorer.exe", FileSystem.Current.AppDataDirectory);
         }
 
         private void Search()
@@ -334,7 +320,7 @@ namespace Enforsement.Core.ViewModel
                 if (result == "OK")
                 {
                     await App.DataBase.DeleteAsync(SoketToEnforsementClass.Convert(selectedItem));
-                    
+
                     selectedItem = null;
                     DescriptionDescription = null;
                     CourtDescription = null;
@@ -348,7 +334,7 @@ namespace Enforsement.Core.ViewModel
                     StatusDescription = null;
                     await LoadItems();
                 }
-            }       
+            }
         }
 
         private async void Edit()
@@ -369,6 +355,11 @@ namespace Enforsement.Core.ViewModel
                     enforsementClass.Investigator = InvestigatorDescription;
                     enforsementClass.Description = DescriptionDescription;
                     enforsementClass.Status = StatusDescription;
+                    var control = ItemControl(enforsementClass);
+                    if (control != null)
+                    {
+                        enforsementClass = control;
+                    }
                     await App.DataBase.UpdateAsync(enforsementClass);
                     await LoadItems();
                 }
@@ -407,7 +398,6 @@ namespace Enforsement.Core.ViewModel
             }
         }
 
-
         private async void Clone()
         {
             if (selectedItem != null)
@@ -434,7 +424,7 @@ namespace Enforsement.Core.ViewModel
                     if (!String.IsNullOrWhiteSpace(_description))
                     {
                         enforsementClass.Description = _description;
-                        await App.DataBase.SaveAsync(enforsementClass);              
+                        await App.DataBase.SaveAsync(enforsementClass);
                         SortState = "За порядковим номером";
                         Clear();
                         await Shell.Current.DisplayAlert("Додати новий елемент", $"Зарєстровано, порядковий номер {count}", "OK");
@@ -461,9 +451,9 @@ namespace Enforsement.Core.ViewModel
             }
             foreach (var item in await App.DataBase.GetAllAsync())
             {
-                using(StreamWriter sr = new StreamWriter(Path.Combine(FileSystem.Current.AppDataDirectory, "export.csv"), true))
+                using (StreamWriter sr = new StreamWriter(Path.Combine(FileSystem.Current.AppDataDirectory, "export.csv"), true))
                 {
-                    string text = $"{item.Id}\t{item.Type}\t{item.CriminalNumber}\t{item.InitDate.ToShortDateString()}\t{item.ControlDate.ToShortDateString()}\t{item.Investigator}\t{item.Qualification}\t{item.Court}\t{item.Description}\t{item.Status}";
+                    string text = $"{item.Id}\t{item.Type}\t№{item.CriminalNumber}\t{item.InitDate.ToShortDateString()}\t{item.ControlDate.ToShortDateString()}\t{item.Investigator}\t{item.Qualification}\t{item.Court}\t{item.Description}\t{item.Status}";
                     sr.WriteLine(text);
                 }
             }
@@ -537,23 +527,34 @@ namespace Enforsement.Core.ViewModel
                 {
                     count = n.Last().Id + 1;
                 }
-                
+
                 string _criminalNumber = await Shell.Current.DisplayPromptAsync($"Добавить новый елемент", $"Введіть номер кримінального провадження", maxLength: 17);
                 if (!TextServise.IsNumberValid(_criminalNumber))
                 {
                     await Shell.Current.DisplayAlert("Додати новий елемент", $"Не вірно вказаний номер провадження", "OK");
                     return;
                 }
+
                 List<string> _types = new List<string>(TypeSearchPanel);
-                string _type = await Shell.Current.DisplayActionSheet("Виберіть тип документу", "Cancel", "Destruction", _types.ToArray());
+                string _type = await Shell.Current.DisplayActionSheet("Виберіть тип документу", "Cancel", null, _types.ToArray());
+
                 string _initDate = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть дату документу", maxLength: 10, initialValue: DateTime.Now.ToShortDateString());
                 if (!TextServise.IsDateValid(_initDate))
                 {
                     await Shell.Current.DisplayAlert("Додати новий елемент", $"Не вірно зазанчена дата", "OK");
                     return;
                 }
+
                 string _controlDate;
-                if (_type != "Арешт майна" | _type != "Невідкладний обшук")
+                if (_type == "Арешт майна")
+                {
+                    _controlDate = _initDate;
+                }
+                else if (_type == "Невідкладний обшук")
+                {
+                    _controlDate = _initDate;
+                }
+                else
                 {
                     _controlDate = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть контрольну дату докуенту", maxLength: 10, initialValue: (Convert.ToDateTime(_initDate).AddDays(30)).ToShortDateString());
                     if (!TextServise.IsDateValid(_controlDate))
@@ -562,14 +563,32 @@ namespace Enforsement.Core.ViewModel
                         return;
                     }
                 }
+
+                string _investigator;
+                var lastInvestigator = await App.DataBase.GetLastInvestigator(_criminalNumber);
+                if (lastInvestigator != "empty")
+                {
+                    _investigator = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть слідчого", maxLength: 20, initialValue: lastInvestigator);
+                }
                 else
                 {
-                    _controlDate = DateTime.MaxValue.ToShortDateString();
+                    _investigator = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть слідчого", maxLength: 20);
                 }
-                string _investigator = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть слідчого", maxLength: 20);
-                string _qualification = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть кваліфікацію", maxLength: 3);
+
+                string _qualification;
+                var lastQualification = await App.DataBase.GetLastQualification(_criminalNumber);
+                if (lastQualification != "empty")
+                {
+                    _qualification = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть кваліфікацію", maxLength: 3, initialValue: lastQualification);
+                }
+                else
+                {
+                    _qualification = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть кваліфікацію", maxLength: 3);
+                }
+
                 List<string> _courts = new List<string>(Courts);
-                string _court = await Shell.Current.DisplayActionSheet("Виберіть суд", "Cancel", "Destruction", _courts.ToArray());
+                string _court = await Shell.Current.DisplayActionSheet("Виберіть суд", "Cancel", null, _courts.ToArray());
+
                 string _description = await Shell.Current.DisplayPromptAsync($"Додати новий елемент", $"Введіть опис", maxLength: 300);
 
                 enforsementClass.CriminalNumber = _criminalNumber;
@@ -581,11 +600,15 @@ namespace Enforsement.Core.ViewModel
                 enforsementClass.Court = _court;
                 enforsementClass.Description = _description;
                 enforsementClass.Status = "на виконанні";
+                var control = ItemControl(enforsementClass);
+                if (control != null)
+                {
+                    enforsementClass = control;
+                }
                 await App.DataBase.SaveAsync(enforsementClass);
                 SortState = "За порядковим номером";
                 Clear();
                 await Shell.Current.DisplayAlert("Додати новий елемент", $"Зарєстровано, порядковий номер {count}", "OK");
-
             }
             catch
             {
@@ -612,14 +635,14 @@ namespace Enforsement.Core.ViewModel
                 else if (item.Type == "Невідкладний обшук")
                 {
                     enforsementClassSoket.ControlDateSoket = "-";
-                    enforsementClassSoket.Days = "-" ;
+                    enforsementClassSoket.Days = "-";
                 }
                 else
                 {
                     enforsementClassSoket.ControlDateSoket = item.ControlDate.ToShortDateString();
                     enforsementClassSoket.Days = (item.ControlDate - DateTime.Now).Days.ToString();
                 }
-               
+
 
                 string _typeIcon = "";
                 switch (enforsementClassSoket.Type)
@@ -629,7 +652,7 @@ namespace Enforsement.Core.ViewModel
                         break;
                     case "Тимчасовий доступ":
                         _typeIcon = "📃";
-                        break;                  
+                        break;
                     case "Обшук":
                         _typeIcon = "🔎";
                         break;
@@ -652,7 +675,7 @@ namespace Enforsement.Core.ViewModel
             {
                 _result = _result.OrderBy(x => x.InitDate).ToList();
             }
-            else if(SortState == "За спаданням по даті винесення")
+            else if (SortState == "За спаданням по даті винесення")
             {
                 _result = _result.OrderByDescending(x => x.InitDate).ToList();
             }
@@ -708,10 +731,11 @@ namespace Enforsement.Core.ViewModel
                 }
                 else
                 {
+                    await Shell.Current.DisplayAlert("Пошук", $"Не знайдено", "OK");
                     return;
                 }
             }
-     
+
 
             if (SelectedExecuteSearchPanel == "На виконанні")
             {
@@ -747,7 +771,7 @@ namespace Enforsement.Core.ViewModel
                         _result = _subresult;
                     }
                 }
-                else if (SearchTextSearchPanel.Length > 2)
+                else
                 {
                     var _subresult = _result.Where(x => x.Description.Contains(SearchTextSearchPanel, StringComparison.OrdinalIgnoreCase)).ToList();
                     if (_subresult.Count > 0)
@@ -756,9 +780,10 @@ namespace Enforsement.Core.ViewModel
                     }
                     else
                     {
+                        await Shell.Current.DisplayAlert("Пошук", $"Не знайдено", "OK");
                         return;
                     }
-                    
+
                 }
             }
 
@@ -770,8 +795,70 @@ namespace Enforsement.Core.ViewModel
                     Items.Add(item);
                 }
             }
-            
+
             return;
+        }
+
+        public async Task StartControl()
+        {
+            foreach (var item in await App.DataBase.GetAllAsync())
+            {
+                var r = ItemControl(item);
+                if (r != null)
+                {
+                    await App.DataBase.UpdateAsync(r);
+                }
+            }
+        }
+
+        public EnforsementClass ItemControl(EnforsementClass _item)
+        {
+            bool isEnable = false;
+
+            if (_item.Type == "Арешт майна")
+            {
+                if (_item.ControlDate != _item.InitDate)
+                {
+                    _item.ControlDate = _item.InitDate;
+                    isEnable = true;
+                }
+            }
+
+            if (_item.Type == "Невідкладний обшук")
+            {
+                if (_item.ControlDate != _item.InitDate)
+                {
+                    _item.ControlDate = _item.InitDate;
+                    isEnable = true;
+                }
+            }
+
+            if (String.IsNullOrWhiteSpace(_item.Description))
+            {
+                _item.Description = "-";
+                isEnable = true;
+            }
+
+            if (String.IsNullOrWhiteSpace(_item.Qualification))
+            {
+                _item.Qualification = "-";
+                isEnable = true;
+            }
+
+            if (String.IsNullOrWhiteSpace(_item.Investigator))
+            {
+                _item.Investigator = "-";
+                isEnable = true;
+            }
+
+            if (isEnable == true)
+            {
+                return _item;
+            }
+            else
+            {
+                return null;
+            }   
         }
 
         #endregion

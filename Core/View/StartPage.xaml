@@ -29,14 +29,14 @@
                         <Picker Margin="3,3,3,3" Title="Сортування"
                         ItemsSource="{Binding SortStates}" SelectedItem="{Binding SortState, Mode=TwoWay}"></Picker>
 
+                        <Picker Margin="3,3,3,3" Title="Стан"
+                        ItemsSource="{Binding ExecuteSearchPanel}" SelectedItem="{Binding SelectedExecuteSearchPanel}"></Picker>
+
                         <Picker Margin="3,3,3,3" Title="Тип"
                         ItemsSource="{Binding TypeSearchPanel}" SelectedItem="{Binding SelectedTypeSearchPanel}"></Picker>
 
                         <Picker Margin="3,3,3,3" Title="Стаття"
                         ItemsSource="{Binding QualificationsSearchPanel}" SelectedItem="{Binding SelectedQualificationSearchPanel}"></Picker>
-
-                        <Picker Margin="3,3,3,3" Title="Стан"
-                        ItemsSource="{Binding ExecuteSearchPanel}" SelectedItem="{Binding SelectedExecuteSearchPanel}"></Picker>
 
                         <Grid>
                             <Grid.ColumnDefinitions>

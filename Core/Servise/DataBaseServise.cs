@@ -59,5 +59,31 @@ namespace Enforsement.Core.Servise
         {
             return dataBase.Table<EnforsementClass>().ToListAsync();
         }
+
+        public async Task<string> GetLastInvestigator(string _cNumber)
+        {
+            var result = await dataBase.Table<EnforsementClass>().Where(x => x.CriminalNumber == _cNumber).ToListAsync();
+            if (result.Count > 0)
+            {
+                return result.Last().Investigator;
+            }
+            else
+            {
+                return "empty";
+            }
+        }
+
+        public async Task<string> GetLastQualification(string _cNumber)
+        {
+            var result = await dataBase.Table<EnforsementClass>().Where(x => x.CriminalNumber == _cNumber).ToListAsync();
+            if (result.Count > 0)
+            {
+                return result.Last().Qualification;
+            }
+            else
+            {
+                return "empty";
+            }
+        }
     }
 }
