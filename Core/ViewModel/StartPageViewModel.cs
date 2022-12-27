@@ -304,7 +304,7 @@ namespace Enforsement.Core.ViewModel
 
         private void OpenFolder()
         {
-            Process.Start("explorer.exe", FileSystem.Current.AppDataDirectory);
+            Process.Start("explorer.exe", App.generalPath);
         }
 
         private void Search()
@@ -769,6 +769,11 @@ namespace Enforsement.Core.ViewModel
                     if (_subresult.Count > 0)
                     {
                         _result = _subresult;
+                    }
+                    else
+                    {
+                        await Shell.Current.DisplayAlert("Пошук", $"Не знайдено", "OK");
+                        return;
                     }
                 }
                 else

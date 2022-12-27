@@ -4,7 +4,7 @@ namespace Enforsement;
 
 public partial class App : Application
 {
-    static string generalPath = FileSystem.Current.AppDataDirectory;
+    public static string generalPath = @"Q:\Enforsement\";
     static DataBaseServise dataBase;
     public static DataBaseServise DataBase
     {
@@ -12,7 +12,7 @@ public partial class App : Application
         {
             if (dataBase == null)
             {
-                dataBase = new DataBaseServise(Path.Combine(generalPath, "EnforsementDataBase.db3"));
+                dataBase = new DataBaseServise(Path.Combine(generalPath, @"Data\EnforsementDataBase.db3"));
             }
             return dataBase;
         }
